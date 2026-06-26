@@ -14,7 +14,41 @@ You can change the local server port in the Settings panel. Save the new port, c
 
 Docker is optional. The normal Windows/Python launcher still works without Docker.
 
-From this project folder, run:
+### Option A: Pull The Published Image
+
+Create a folder anywhere, then create a `docker-compose.yml` file with:
+
+```yaml
+services:
+  mam-spender-web:
+    image: ghcr.io/plungis/mam-spender-web-edition:latest
+    container_name: mam-spender-web
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./data:/app/data
+    environment:
+      MAM_SPENDER_HOST: 0.0.0.0
+      MAM_SPENDER_PORT: 8765
+      MAM_SPENDER_OPEN_BROWSER: "0"
+    restart: unless-stopped
+```
+
+Then run:
+
+```powershell
+docker compose up -d
+```
+
+Open:
+
+```text
+http://127.0.0.1:8765
+```
+
+### Option B: Build Locally
+
+From the project folder, run:
 
 ```powershell
 docker compose up --build
@@ -43,6 +77,7 @@ Docker notes:
 - The app listens on `0.0.0.0` inside Docker, but you still open it from your computer at `http://127.0.0.1:8765`.
 - The browser file picker/save dialog may not work the same way inside Docker. For Docker, the easiest path is usually pasting the Mam Session_ID and choosing the plain-text local app settings option, or manually placing a cookie file in the `data` folder.
 - If you change the Docker port, update both `ports` and `MAM_SPENDER_PORT` in `docker-compose.yml`.
+- The published image is built automatically from the GitHub repo and published as `ghcr.io/plungis/mam-spender-web-edition:latest`.
 
 ## Behavior
 
