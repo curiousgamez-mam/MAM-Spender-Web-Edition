@@ -62,6 +62,9 @@ def env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+FILE_DIALOGS_ENABLED = env_bool("MAM_SPENDER_FILE_DIALOGS", True)
+
+
 def browser_url() -> str:
     browser_host = os.environ.get("MAM_SPENDER_BROWSER_HOST", "").strip()
     if not browser_host:
@@ -235,6 +238,8 @@ class App:
                 "active_port": PORT,
                 "cookie_exists": Path(cookie_path).expanduser().exists() if cookie_path else False,
                 "session_id_saved": bool(self.state.settings.plain_session_id),
+                "file_dialogs_enabled": FILE_DIALOGS_ENABLED,
+                "default_session_id_file": str(COOKIE_FILE),
                 "logs": list(self.state.logs),
                 "history": list(reversed(self.state.history[-200:])),
                 "spend_events": list(self.state.spend_events[-500:]),
@@ -315,7 +320,15 @@ class App:
             self.log("Mam Session_ID saved in local app settings as plain text.")
             return self.public_state()
 
-        target = self.choose_cookie_save_path()
+        if FILE_DIALOGS_ENABLED:
+            target = self.choose_cookie_save_path()
+        else:
+            with self.lock:
+                path_value = self.state.settings.cookie_file_path.strip()
+            target = Path(path_value).expanduser() if path_value else COOKIE_FILE
+            if not target.is_absolute():
+                target = DATA_DIR / target
+
         if not target:
             self.log("Mam Session_ID save canceled.")
             return self.public_state()
@@ -329,6 +342,8 @@ class App:
         return self.public_state()
 
     def choose_cookie_save_path(self) -> Path | None:
+        if not FILE_DIALOGS_ENABLED:
+            return COOKIE_FILE
         try:
             import tkinter as tk
             from tkinter import filedialog
@@ -366,6 +381,11 @@ class App:
         return self.public_state()
 
     def browse_cookie_file(self) -> dict[str, Any]:
+        if not FILE_DIALOGS_ENABLED:
+            raise RuntimeError(
+                "File picker is disabled in Docker. Put the file in the mounted data folder "
+                "and enter /app/data/filename, or paste the Session_ID and click Save Session_ID."
+            )
         try:
             import tkinter as tk
             from tkinter import filedialog

@@ -31,6 +31,7 @@ services:
       MAM_SPENDER_HOST: 0.0.0.0
       MAM_SPENDER_PORT: 8765
       MAM_SPENDER_OPEN_BROWSER: "0"
+      MAM_SPENDER_FILE_DIALOGS: "0"
     restart: unless-stopped
 ```
 
@@ -75,7 +76,7 @@ The Docker setup stores settings and Session_ID files in the local `data` folder
 Docker notes:
 
 - The app listens on `0.0.0.0` inside Docker, but you still open it from your computer at `http://127.0.0.1:8765`.
-- The browser file picker/save dialog may not work the same way inside Docker. For Docker, the easiest path is usually pasting the Mam Session_ID and choosing the plain-text local app settings option, or manually placing a cookie file in the `data` folder.
+- Desktop file picker/save dialogs are disabled in Docker. Paste the Mam Session_ID and save it as `/app/data/MAM.cookies`, or manually place a cookie file in the mounted `data` folder and enter its container path.
 - If you change the Docker port, update both `ports` and `MAM_SPENDER_PORT` in `docker-compose.yml`.
 - The published image is built automatically from the GitHub repo and published as `ghcr.io/plungis/mam-spender-web-edition:latest`.
 

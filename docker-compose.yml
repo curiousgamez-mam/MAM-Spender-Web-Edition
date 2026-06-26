@@ -10,4 +10,5 @@ services:
       MAM_SPENDER_HOST: 0.0.0.0
       MAM_SPENDER_PORT: 8765
       MAM_SPENDER_OPEN_BROWSER: "0"
+      MAM_SPENDER_FILE_DIALOGS: "0"
     restart: unless-stopped

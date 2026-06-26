@@ -257,10 +257,17 @@ function render(next) {
   renderSettings();
   renderRunOverview();
   renderPortStatus();
+  $("browseCookiePathBtn").disabled = !state.file_dialogs_enabled;
+  $("browseCookiePathBtn").title = state.file_dialogs_enabled
+    ? "Browse to a local Session_ID file"
+    : "File picker is disabled in Docker. Use /app/data/filename or paste and save a Session_ID.";
   if (state.session_id_saved) {
     $("cookieStatus").textContent = "Mam Session_ID saved in local app settings as plain text.";
   } else if (state.cookie_exists) {
     $("cookieStatus").textContent = "Mam Session_ID file found. The app will read it when it runs.";
+  } else if (!state.file_dialogs_enabled) {
+    $("cookieStatus").textContent =
+      `Docker mode: paste a Session_ID and save it, or put a file in data and use ${state.default_session_id_file || "/app/data/MAM.cookies"}.`;
   } else {
     $("cookieStatus").textContent = "No Mam Session_ID saved yet. Paste a Session_ID below or choose an existing file path.";
   }
@@ -384,7 +391,9 @@ $("saveCookieBtn").addEventListener("click", async () => {
       return;
     }
     const saveAsFile = confirm(
-      "Save this Mam Session_ID as a cookie file?\n\nOK: choose where to save the cookie file.\nCancel: store it locally in the app settings as plain text."
+      state?.file_dialogs_enabled
+        ? "Save this Mam Session_ID as a cookie file?\n\nOK: choose where to save the cookie file.\nCancel: store it locally in the app settings as plain text."
+        : "Save this Mam Session_ID as /app/data/MAM.cookies?\n\nOK: save it as a mounted data file.\nCancel: store it locally in the app settings as plain text."
     );
     await api("/api/session_id", {
       session_id: sessionId,
