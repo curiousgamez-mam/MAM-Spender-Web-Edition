@@ -10,6 +10,40 @@ The app opens at `http://127.0.0.1:8765` by default. Close the command window to
 
 You can change the local server port in the Settings panel. Save the new port, close the command window, then start the app again. The new address will be `http://127.0.0.1:YOUR_PORT`.
 
+## Run With Docker
+
+Docker is optional. The normal Windows/Python launcher still works without Docker.
+
+From this project folder, run:
+
+```powershell
+docker compose up --build
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+To stop it:
+
+```powershell
+docker compose down
+```
+
+The Docker setup stores settings and Session_ID files in the local `data` folder through a volume mount:
+
+```text
+./data:/app/data
+```
+
+Docker notes:
+
+- The app listens on `0.0.0.0` inside Docker, but you still open it from your computer at `http://127.0.0.1:8765`.
+- The browser file picker/save dialog may not work the same way inside Docker. For Docker, the easiest path is usually pasting the Mam Session_ID and choosing the plain-text local app settings option, or manually placing a cookie file in the `data` folder.
+- If you change the Docker port, update both `ports` and `MAM_SPENDER_PORT` in `docker-compose.yml`.
+
 ## Behavior
 
 - Checks your MAM account using your Mam Session_ID.

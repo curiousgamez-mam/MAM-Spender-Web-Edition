@@ -1,0 +1,19 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV MAM_SPENDER_HOST=0.0.0.0
+ENV MAM_SPENDER_PORT=8765
+ENV MAM_SPENDER_OPEN_BROWSER=0
+
+WORKDIR /app
+
+COPY app.py README.md ./
+COPY static ./static
+
+RUN mkdir -p /app/data
+
+VOLUME ["/app/data"]
+EXPOSE 8765
+
+CMD ["python", "app.py"]

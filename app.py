@@ -19,7 +19,7 @@ from typing import Any
 
 
 APP_VERSION = "V1.0"
-HOST = "127.0.0.1"
+HOST = os.environ.get("MAM_SPENDER_HOST", "127.0.0.1").strip() or "127.0.0.1"
 DEFAULT_PORT = 8765
 MIN_SERVER_PORT = 1024
 MAX_SERVER_PORT = 65535
@@ -53,6 +53,20 @@ def configured_port() -> int:
 
 
 PORT = configured_port()
+
+
+def env_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def browser_url() -> str:
+    browser_host = os.environ.get("MAM_SPENDER_BROWSER_HOST", "").strip()
+    if not browser_host:
+        browser_host = "127.0.0.1" if HOST in {"0.0.0.0", "::"} else HOST
+    return f"http://{browser_host}:{PORT}"
 
 MAM_BASE = "https://www.myanonamouse.net"
 MAM_API_ENDPOINT = f"{MAM_BASE}/jsonLoad.php"
@@ -899,17 +913,23 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    url = f"http://{HOST}:{PORT}"
+    bind_url = f"http://{HOST}:{PORT}"
+    url = browser_url()
     try:
         server = ThreadingHTTPServer((HOST, PORT), Handler)
     except OSError as exc:
-        print(f"Could not start MAM Spender Web on {url}: {exc}")
+        print(f"Could not start MAM Spender Web on {bind_url}: {exc}")
         print("Try a different server port in Settings, or close the app already using this port.")
-        input("Press Enter to close...")
+        try:
+            input("Press Enter to close...")
+        except EOFError:
+            pass
         return
-    print(f"MAM Spender Web is running at {url}")
+    print(f"MAM Spender Web is listening on {bind_url}")
+    print(f"Open {url} in your browser.")
     print("Close this window to stop it.")
-    threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+    if env_bool("MAM_SPENDER_OPEN_BROWSER", True):
+        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     server.serve_forever()
 
 

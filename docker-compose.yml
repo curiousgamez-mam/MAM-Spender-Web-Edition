@@ -1,0 +1,13 @@
+services:
+  mam-spender-web:
+    build: .
+    container_name: mam-spender-web
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./data:/app/data
+    environment:
+      MAM_SPENDER_HOST: 0.0.0.0
+      MAM_SPENDER_PORT: 8765
+      MAM_SPENDER_OPEN_BROWSER: "0"
+    restart: unless-stopped
