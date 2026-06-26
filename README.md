@@ -41,6 +41,13 @@ Then run:
 docker compose up -d
 ```
 
+To update an existing Docker install:
+
+```powershell
+docker compose pull
+docker compose up -d --force-recreate
+```
+
 Open:
 
 ```text

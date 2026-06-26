@@ -62,7 +62,15 @@ def env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-FILE_DIALOGS_ENABLED = env_bool("MAM_SPENDER_FILE_DIALOGS", True)
+def default_file_dialogs_enabled() -> bool:
+    if os.environ.get("MAM_SPENDER_FILE_DIALOGS") is not None:
+        return env_bool("MAM_SPENDER_FILE_DIALOGS", True)
+    if os.name != "nt" and not os.environ.get("DISPLAY"):
+        return False
+    return True
+
+
+FILE_DIALOGS_ENABLED = default_file_dialogs_enabled()
 
 
 def browser_url() -> str:
@@ -321,7 +329,11 @@ class App:
             return self.public_state()
 
         if FILE_DIALOGS_ENABLED:
-            target = self.choose_cookie_save_path()
+            try:
+                target = self.choose_cookie_save_path()
+            except RuntimeError as exc:
+                self.log(f"Save dialog unavailable; saving to default data file instead: {exc}")
+                target = COOKIE_FILE
         else:
             with self.lock:
                 path_value = self.state.settings.cookie_file_path.strip()
@@ -390,7 +402,10 @@ class App:
             import tkinter as tk
             from tkinter import filedialog
         except Exception as exc:
-            raise RuntimeError(f"File browser is not available: {exc}") from exc
+            raise RuntimeError(
+                "File picker is not available in this environment. Put the file in the mounted data folder "
+                "and enter its path, or paste the Session_ID and click Save Session_ID."
+            ) from exc
 
         root = tk.Tk()
         root.withdraw()
