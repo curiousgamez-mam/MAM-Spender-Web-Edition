@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MAM SPENDER - WEB EDITION</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div class="brand-block">
+          <h1>MAM SPENDER - WEB EDITION</h1>
+          <p class="version-line">
+            <span>Web Edition V1.0</span>
+            <span>|</span>
+            <a href="https://github.com/Plungis/MAM-Spender" target="_blank" rel="noreferrer">(See Windows Executable Version 2.4 here)</a>
+          </p>
+        </div>
+        <div class="top-actions">
+          <div class="header-meta">
+            <p id="statusLine" class="status-line">Current Status: Loading...</p>
+            <p id="runOverview" class="micro">Current Settings: loading...</p>
+          </div>
+          <div class="actions">
+            <button id="startBtn" class="primary">Start Scheduled Run</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="runBtn">Run Now</button>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Views">
+        <button class="tab active" data-tab="dashboard">Dashboard</button>
+        <button class="tab" data-tab="history">History</button>
+        <button class="tab" data-tab="graph">Graph</button>
+      </nav>
+
+      <section id="dashboard" class="tab-panel active grid">
+        <article class="panel wide">
+          <h2>Run Log</h2>
+          <pre id="logBox"></pre>
+        </article>
+
+        <article class="panel">
+          <h2>User</h2>
+          <dl class="facts">
+            <div><dt>Username</dt><dd id="username">N/A</dd></div>
+            <div><dt>VIP Expires</dt><dd id="vipExpires">N/A</dd></div>
+            <div><dt>Downloaded</dt><dd id="downloaded">N/A</dd></div>
+            <div><dt>Uploaded</dt><dd id="uploaded">N/A</dd></div>
+            <div><dt>Ratio</dt><dd id="ratio">N/A</dd></div>
+            <div><dt>Last Points</dt><dd id="lastPoints">N/A</dd></div>
+            <div><dt>Points/Min</dt><dd id="pointsPerMin">N/A</dd></div>
+          </dl>
+        </article>
+
+        <article class="panel">
+          <h2>Totals</h2>
+          <dl class="facts">
+            <div><dt>Total GiB Bought</dt><dd id="totalGb">0</dd></div>
+            <div><dt>Points Spent</dt><dd id="totalPoints">0</dd></div>
+            <div><dt>FL Wedges Bought</dt><dd id="wedgeBought">0</dd></div>
+            <div><dt>FL Wedge Pts</dt><dd id="wedgePoints">0</dd></div>
+            <div><dt>VIP Purchases</dt><dd id="vipPurchases">0</dd></div>
+            <div><dt>Next Run</dt><dd id="nextRun">Not scheduled</dd></div>
+          </dl>
+          <div class="actions left stack-actions">
+            <button id="resetBtn" class="danger">Reset Totals</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Settings</h2>
+          <label class="check"><input id="buyVip" type="checkbox" checked> Buy max VIP when needed</label>
+          <label class="check"><input id="buyFlBeforeGb" type="checkbox"> Buy FL wedge before upload</label>
+          <label class="check"><input id="flOnly" type="checkbox"> Buy only Freeleech Wedges</label>
+
+          <label class="field">
+            <span>Points buffer</span>
+            <div class="number-control">
+              <button type="button" class="step-btn" data-target="pointsBuffer" data-step="-500">-</button>
+              <input id="pointsBuffer" type="number" min="0" max="49000" step="100" value="10000">
+              <button type="button" class="step-btn" data-target="pointsBuffer" data-step="500">+</button>
+            </div>
+            <div class="quick-row">
+              <button type="button" class="quick-btn" data-target="pointsBuffer" data-value="10000">10k</button>
+              <button type="button" class="quick-btn" data-target="pointsBuffer" data-value="15000">15k</button>
+              <button type="button" class="quick-btn" data-target="pointsBuffer" data-value="25000">25k</button>
+              <button type="button" class="quick-btn" data-target="pointsBuffer" data-value="49000">49k</button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Next run delay (minutes)</span>
+            <div class="number-control">
+              <button type="button" class="step-btn" data-target="delayMinutes" data-step="-1">-</button>
+              <input id="delayMinutes" type="number" min="2" step="1" value="15">
+              <button type="button" class="step-btn" data-target="delayMinutes" data-step="1">+</button>
+            </div>
+            <div class="quick-row delay-presets">
+              <button type="button" class="quick-btn metric-btn" data-target="delayMinutes" data-value="2">
+                <strong>2m</strong><small data-pph-for="2"></small>
+              </button>
+              <button type="button" class="quick-btn metric-btn" data-target="delayMinutes" data-value="60">
+                <strong>1h</strong><small data-pph-for="60"></small>
+              </button>
+              <button type="button" class="quick-btn metric-btn" data-target="delayMinutes" data-value="360">
+                <strong>6h</strong><small data-pph-for="360"></small>
+              </button>
+              <button type="button" class="quick-btn metric-btn" data-target="delayMinutes" data-value="720">
+                <strong>12h</strong><small data-pph-for="720"></small>
+              </button>
+              <button type="button" class="quick-btn metric-btn" data-target="delayMinutes" data-value="1440">
+                <strong>24h</strong><small data-pph-for="1440"></small>
+              </button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Server port</span>
+            <div class="number-control port-control">
+              <button type="button" class="step-btn" data-target="serverPort" data-step="-1">-</button>
+              <input id="serverPort" type="number" min="1024" max="65535" step="1" value="8765">
+              <button type="button" class="step-btn" data-target="serverPort" data-step="1">+</button>
+            </div>
+            <p class="small" id="portStatus">Current server port: 8765.</p>
+          </label>
+          <button id="saveSettingsBtn">Save Settings</button>
+        </article>
+
+        <article class="panel">
+          <h2>Mam Session_ID</h2>
+          <p class="small" id="cookieStatus">Checking Mam Session_ID...</p>
+          <label class="field">
+            <span>Mam Session_ID file path or export</span>
+            <input id="cookiePath" type="text">
+          </label>
+          <label class="field">
+            <span>Paste Mam Session_ID value or Cookie header</span>
+            <input id="cookieValue" type="password" autocomplete="off">
+          </label>
+          <div class="actions left">
+            <button id="browseCookiePathBtn">Browse File</button>
+            <button id="checkCookiePathBtn">Check File</button>
+            <button id="saveCookieBtn">Save Session_ID</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>MaM Extras</h2>
+          <p class="small">Quick links and help for common MAM pages.</p>
+          <div class="actions left stack-actions">
+            <button id="instructionsBtn" type="button">Instructions</button>
+            <a class="linkBtn" href="https://www.myanonamouse.net/play_lotto.php" target="_blank" rel="noreferrer">MAM Lotto</a>
+            <a class="linkBtn" href="https://www.myanonamouse.net/millionaires/donate.php" target="_blank" rel="noreferrer">Millionaire's Vault</a>
+          </div>
+        </article>
+      </section>
+
+      <section id="history" class="tab-panel">
+        <article class="panel">
+          <h2>History</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Result</th>
+                  <th>Points</th>
+                  <th>Upload</th>
+                  <th>FL Wedges</th>
+                  <th>VIP</th>
+                </tr>
+              </thead>
+              <tbody id="historyRows">
+                <tr><td colspan="6">No history yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="graph" class="tab-panel">
+        <article class="panel">
+          <h2>Spending Pie Chart</h2>
+          <canvas id="spendChart" width="980" height="360" aria-label="Spending by category pie chart"></canvas>
+          <div id="graphLegend" class="legend"></div>
+        </article>
+        <article class="panel">
+          <h2>Spending Events</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Spent On</th>
+                  <th>Points</th>
+                  <th>Units</th>
+                  <th>Balance After</th>
+                </tr>
+              </thead>
+              <tbody id="spendRows">
+                <tr><td colspan="5">No spending events yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <footer class="app-footer">
+        <button id="thanksBtn" type="button">Special Thanks</button>
+      </footer>
+    </main>
+
+    <div id="instructionsModal" class="modal" aria-hidden="true">
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="instructionsTitle">
+        <div class="modal-head">
+          <h2 id="instructionsTitle">Instructions</h2>
+          <button id="closeInstructionsBtn" type="button">Close</button>
+        </div>
+        <div class="instructions-body">
+          <h3>Important: How Cookies Work</h3>
+          <p>Your MAM session cookie is tied to your IP address.</p>
+          <p>Your IP may change when your router restarts, your device disconnects or reconnects to your ISP, or your ISP rotates addresses automatically.</p>
+          <p>When your IP changes, your cookie becomes invalid. This is normal behavior. If the app reports a session error, simply create a new cookie.</p>
+
+          <h3>Step 1: Create A Valid Cookie</h3>
+          <p>You must do this on the same device that runs MAM Spender Web.</p>
+          <ol>
+            <li>Log into <a href="https://www.myanonamouse.net" target="_blank" rel="noreferrer">myanonamouse.net</a>.</li>
+            <li>Open Menu, then Preferences, then Security.</li>
+            <li>Under Active Sessions, keep the entry that says "log out". This is your current session. Remove any other entries.</li>
+            <li>Copy your IP address shown there. It will look something like <code>XX.XXX.XXX.XX (XXXXX)</code>.</li>
+            <li>Scroll to Create Session.</li>
+            <li>Select the radio option "ASN locked".</li>
+            <li>Paste your IP address into the IP field. Be careful of trailing spaces.</li>
+            <li>Click Create.</li>
+            <li>Copy the long string that appears. This is your cookie value.</li>
+          </ol>
+
+          <h3>Step 2: Create Or Update Cookie File</h3>
+          <p>Option A: Use the Mam Session_ID panel in this app. Paste the Session_ID string, choose where to save it, and click Save Session_ID. Recommended file name: <code>MAM.cookies</code>.</p>
+          <p>Option B: Replace an existing cookie file. Open your existing <code>.cookies</code> file, replace its contents with the new cookie string, and save the file.</p>
+          <p>Keep this file private. Anyone with it can use your session.</p>
+
+          <h3>Notes &amp; Warnings</h3>
+          <ul>
+            <li>Minimum upload purchase is 50 GiB.</li>
+            <li>Purchases are irreversible.</li>
+            <li>Points are always rounded down.</li>
+            <li>Freeleech Wedges cost 50,000 points each.</li>
+            <li>If your IP changes, recreate your cookie.</li>
+            <li>This tool is not affiliated with MyAnonamouse.</li>
+          </ul>
+          <div class="actions left">
+            <a class="linkBtn" href="https://www.myanonamouse.net/preferences/index.php?view=security" target="_blank" rel="noreferrer">Open MAM Security</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="thanksModal" class="modal" aria-hidden="true">
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="thanksTitle">
+        <div class="modal-head">
+          <h2 id="thanksTitle">Special Thanks</h2>
+          <button id="closeThanksBtn" type="button">Close</button>
+        </div>
+        <div class="credits-window">
+          <div class="credits-roll">
+            <p>The MAM Staff for everything they do.</p>
+            <p>Knightguard - Created Original Script I based my projects off of.</p>
+            <p>BareMetal / B4reMetal - Submitted and fixed app after MAM purchase rules changed.</p>
+            <p>Curiosgamez - Published the v2.4wfb introducing shorter interval scheduling, updated purchase logic, and several bug fixes.</p>
+            <p>Mr. Cookies - Extensive feedback on features.</p>
+            <p>PsyckoRN - Feature Request.</p>
+            <p>wokka - Feature Request.</p>
+            <p>romey - Feature Request.</p>
+            <p>And of course everyone else that's offered support in the forum thread.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
